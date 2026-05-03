@@ -1,0 +1,1567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jimbana — NERDC Online Examination Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --green:#0F9B6A;--green-light:#E1F5EE;--green-mid:#1D9E75;--green-dark:#085041;
+  --gold:#D4A017;--gold-light:#FFF8E7;--gold-dark:#92400E;
+  --navy:#1A2545;--navy-light:#2D3A5E;--navy-mid:#3D4F7A;
+  --red:#DC2626;--red-light:#FEE2E2;
+  --blue:#2563EB;--blue-light:#EFF6FF;
+  --purple:#7C3AED;--purple-light:#EDE9FE;
+  --surface:#F4F7FB;--white:#FFFFFF;
+  --border:#E2E8F0;--border-dark:#CBD5E1;
+  --text:#1A2545;--muted:#64748B;--hint:#94A3B8;
+  --radius:12px;--radius-sm:8px;--radius-lg:16px;
+  --shadow:0 2px 16px rgba(15,155,106,0.08);
+  --shadow-md:0 4px 24px rgba(26,37,69,0.10);
+  --font:'Sora',sans-serif;--mono:'Space Mono',monospace;
+}
+body{font-family:var(--font);background:var(--surface);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh;overflow-x:hidden;}
+
+/* ===== LAYOUT ===== */
+.app{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+.main{display:flex;flex:1;overflow:hidden;}
+.content{flex:1;overflow-y:auto;padding:28px 32px;}
+
+/* ===== TOPBAR ===== */
+.topbar{background:var(--navy);color:#fff;display:flex;align-items:center;gap:0;height:60px;flex-shrink:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,0.15);}
+.topbar-logo{display:flex;align-items:center;gap:12px;padding:0 24px;border-right:1px solid rgba(255,255,255,0.1);height:100%;min-width:220px;}
+.logo-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--green),var(--green-mid));border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;font-weight:700;color:#fff;flex-shrink:0;}
+.logo-text{font-size:22px;font-weight:800;letter-spacing:-1px;color:#fff;}
+.logo-text span{color:var(--gold);}
+.logo-tagline{font-size:9px;color:rgba(255,255,255,0.45);letter-spacing:1px;text-transform:uppercase;margin-top:-2px;}
+.topbar-nav{display:flex;align-items:center;gap:2px;padding:0 16px;flex:1;}
+.tnav{background:none;border:none;color:rgba(255,255,255,0.6);font-family:var(--font);font-size:12.5px;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all .18s;white-space:nowrap;}
+.tnav:hover{background:rgba(255,255,255,0.08);color:#fff;}
+.tnav.active{background:rgba(15,155,106,0.25);color:var(--green-light);font-weight:600;}
+.topbar-right{display:flex;align-items:center;gap:12px;padding:0 20px;border-left:1px solid rgba(255,255,255,0.1);}
+.live-badge{background:var(--green);color:#fff;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;font-family:var(--mono);animation:pulseGlow 2s infinite;display:flex;align-items:center;gap:5px;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#fff;animation:blink 1s infinite;}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 0 0 rgba(15,155,106,0.4)}50%{box-shadow:0 0 0 6px rgba(15,155,106,0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.topbar-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#E5890A);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;cursor:pointer;border:2px solid rgba(255,255,255,0.2);}
+.topbar-user{color:rgba(255,255,255,0.75);font-size:12px;}
+.topbar-user strong{display:block;color:#fff;font-size:13px;}
+
+/* ===== SIDEBAR ===== */
+.sidebar{width:228px;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;padding:12px 10px 20px;}
+.sidebar-logo-sm{display:none;}
+.sb-section{font-size:10px;font-weight:700;color:var(--hint);letter-spacing:1.2px;text-transform:uppercase;padding:14px 10px 6px;}
+.sb-section:first-child{padding-top:6px;}
+.sitem{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;cursor:pointer;color:var(--muted);font-size:13px;font-weight:500;transition:all .15s;border:none;background:none;width:100%;text-align:left;position:relative;}
+.sitem:hover{background:var(--green-light);color:var(--green-dark);}
+.sitem.active{background:var(--green);color:#fff;}
+.sitem .si{width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.sitem .sb{margin-left:auto;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;font-family:var(--mono);}
+.sitem .sb.red{background:#FEE2E2;color:#991B1B;}
+.sitem .sb.gold{background:var(--gold-light);color:var(--gold-dark);}
+.sitem.active .sb{background:rgba(255,255,255,0.25);color:#fff;}
+.sb-divider{height:1px;background:var(--border);margin:8px 10px;}
+
+/* ===== PAGE SYSTEM ===== */
+.page{display:none;}
+.page.active{display:block;animation:fadeIn .2s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.page-header{margin-bottom:28px;}
+.page-title{font-size:24px;font-weight:800;color:var(--navy);letter-spacing:-0.5px;}
+.page-sub{color:var(--muted);font-size:13px;margin-top:3px;}
+
+/* ===== CARDS ===== */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:22px;}
+.card-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.card-title .ct-right{display:flex;align-items:center;gap:8px;}
+
+/* ===== STAT CARDS ===== */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative;overflow:hidden;}
+.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3.5px;border-radius:var(--radius) var(--radius) 0 0;}
+.stat-card.sc-green::after{background:linear-gradient(90deg,var(--green),var(--green-mid));}
+.stat-card.sc-gold::after{background:linear-gradient(90deg,var(--gold),#F59E0B);}
+.stat-card.sc-blue::after{background:linear-gradient(90deg,var(--blue),#60A5FA);}
+.stat-card.sc-red::after{background:linear-gradient(90deg,var(--red),#F87171);}
+.stat-card.sc-purple::after{background:linear-gradient(90deg,var(--purple),#A78BFA);}
+.stat-lbl{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;}
+.stat-val{font-size:30px;font-weight:800;font-family:var(--mono);color:var(--navy);line-height:1;}
+.stat-change{font-size:11px;margin-top:6px;font-weight:500;}
+.stat-change.up{color:var(--green);}
+.stat-change.dn{color:var(--red);}
+.stat-icon{position:absolute;right:16px;top:16px;font-size:22px;opacity:.15;}
+
+/* ===== CHIPS & BADGES ===== */
+.chip{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.3px;}
+.chip.green{background:var(--green-light);color:var(--green-dark);}
+.chip.gold{background:var(--gold-light);color:var(--gold-dark);}
+.chip.blue{background:var(--blue-light);color:#1D4ED8;}
+.chip.red{background:var(--red-light);color:#991B1B;}
+.chip.purple{background:var(--purple-light);color:#5B21B6;}
+.chip.navy{background:#EEF2FF;color:var(--navy);}
+.chip.gray{background:#F1F5F9;color:var(--muted);}
+
+/* ===== BUTTONS ===== */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--radius-sm);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:all .18s;border:none;white-space:nowrap;}
+.btn-primary{background:var(--green);color:#fff;}
+.btn-primary:hover{background:var(--green-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(15,155,106,0.3);}
+.btn-secondary{background:var(--white);color:var(--navy);border:1px solid var(--border);}
+.btn-secondary:hover{border-color:var(--green);color:var(--green);background:var(--green-light);}
+.btn-gold{background:var(--gold);color:#fff;}
+.btn-gold:hover{background:var(--gold-dark);}
+.btn-navy{background:var(--navy);color:#fff;}
+.btn-navy:hover{background:var(--navy-light);}
+.btn-danger{background:var(--red);color:#fff;}
+.btn-danger:hover{background:#B91C1C;}
+.btn-sm{padding:6px 12px;font-size:11px;border-radius:6px;}
+.btn-icon{padding:7px;border-radius:7px;}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important;}
+
+/* ===== FORMS ===== */
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;}
+.form-input{border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;font-family:var(--font);font-size:13px;color:var(--text);background:var(--white);outline:none;transition:border .18s,box-shadow .18s;width:100%;}
+.form-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(15,155,106,0.12);}
+.form-input::placeholder{color:var(--hint);}
+select.form-input{cursor:pointer;}
+textarea.form-input{resize:vertical;min-height:80px;}
+.form-row{display:grid;gap:14px;}
+.form-row.col2{grid-template-columns:1fr 1fr;}
+.form-row.col3{grid-template-columns:1fr 1fr 1fr;}
+.form-row.col4{grid-template-columns:1fr 1fr 1fr 1fr;}
+.span2{grid-column:span 2;}
+.span3{grid-column:span 3;}
+
+/* ===== TABLES ===== */
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.6px;padding:10px 16px;text-align:left;border-bottom:1.5px solid var(--border);white-space:nowrap;}
+.tbl td{padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
+.tbl tr:last-child td{border:none;}
+.tbl tbody tr{transition:background .12s;}
+.tbl tbody tr:hover td{background:var(--green-light);}
+
+/* ===== ACTIVITY ===== */
+.activity-list{display:flex;flex-direction:column;gap:10px;}
+.a-item{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--surface);border-radius:10px;}
+.a-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.a-icon.green{background:var(--green-light);}
+.a-icon.gold{background:var(--gold-light);}
+.a-icon.blue{background:var(--blue-light);}
+.a-icon.red{background:var(--red-light);}
+.a-info{flex:1;min-width:0;}
+.a-info strong{font-size:13px;font-weight:600;color:var(--navy);display:block;}
+.a-info span{font-size:11px;color:var(--muted);}
+.a-time{font-size:11px;color:var(--hint);font-family:var(--mono);white-space:nowrap;}
+
+/* ===== LEADERBOARD ===== */
+.lb-panel{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.lb-head{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 100%);padding:22px 26px;color:#fff;position:relative;overflow:hidden;}
+.lb-head::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(15,155,106,0.15);}
+.lb-head::after{content:'';position:absolute;bottom:-40px;right:60px;width:80px;height:80px;border-radius:50%;background:rgba(212,160,23,0.1);}
+.lb-head-title{font-size:17px;font-weight:800;position:relative;z-index:1;}
+.lb-head-sub{font-size:12px;color:rgba(255,255,255,0.6);margin-top:3px;position:relative;z-index:1;}
+.lb-head-stats{display:flex;gap:20px;margin-top:14px;position:relative;z-index:1;}
+.lb-head-stat{text-align:center;}
+.lb-head-stat .val{font-size:20px;font-weight:800;font-family:var(--mono);color:var(--gold);}
+.lb-head-stat .lbl{font-size:10px;color:rgba(255,255,255,0.55);}
+.lb-podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:14px;padding:22px;background:var(--surface);border-bottom:1px solid var(--border);}
+.pod-card{text-align:center;padding:18px 12px;border-radius:var(--radius);background:var(--white);border:1px solid var(--border);position:relative;transition:transform .2s;}
+.pod-card:hover{transform:translateY(-2px);}
+.pod-card.p1{border-color:var(--gold);background:var(--gold-light);}
+.pod-crown{font-size:22px;margin-bottom:6px;}
+.pod-av{width:50px;height:50px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;}
+.p1 .pod-av{background:linear-gradient(135deg,var(--gold),#E5890A);width:58px;height:58px;font-size:20px;}
+.p2 .pod-av{background:linear-gradient(135deg,#94A3B8,#64748B);}
+.p3 .pod-av{background:linear-gradient(135deg,#CD7C3C,#92400E);}
+.pod-name{font-size:12px;font-weight:700;color:var(--navy);}
+.pod-class{font-size:10px;color:var(--muted);margin-top:2px;}
+.pod-score{font-size:22px;font-weight:800;font-family:var(--mono);color:var(--green);margin-top:8px;}
+.p1 .pod-score{font-size:26px;}
+.pod-rank-lbl{font-size:10px;color:var(--muted);}
+.lb-row-rank{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:var(--mono);}
+.r1{background:#FEF3C7;color:#92400E;}
+.r2{background:#F1F5F9;color:#475569;}
+.r3{background:#FEF0E7;color:#9A3412;}
+.rn{background:var(--border);color:var(--muted);}
+.score-pill{background:var(--green-light);color:var(--green-dark);font-weight:700;font-family:var(--mono);padding:4px 11px;border-radius:20px;font-size:12px;}
+.status-indicator{display:inline-flex;align-items:center;gap:5px;font-size:11px;}
+.s-dot{width:7px;height:7px;border-radius:50%;}
+.s-dot.online{background:var(--green);animation:blink 1.5s infinite;}
+.s-dot.done{background:var(--hint);}
+.s-dot.upcoming{background:var(--gold);}
+.prog-mini{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:4px;}
+.prog-mini-fill{height:100%;background:var(--green);border-radius:2px;transition:width 1.2s ease;}
+
+/* ===== QUIZ PLAYER ===== */
+.quiz-shell{display:flex;flex-direction:column;gap:0;}
+.quiz-topbar{background:linear-gradient(135deg,var(--navy),var(--navy-light));color:#fff;border-radius:var(--radius);padding:22px 28px;display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.quiz-info .qi-meta{font-size:11px;color:rgba(255,255,255,0.55);margin-bottom:4px;font-family:var(--mono);}
+.quiz-info .qi-name{font-size:19px;font-weight:800;}
+.quiz-timer-block{text-align:right;}
+.quiz-timer-lbl{font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:2px;}
+.quiz-timer{font-family:var(--mono);font-size:38px;font-weight:700;color:var(--gold);line-height:1;}
+.quiz-timer.warning{color:#FCA5A5;animation:timerWarn .5s infinite alternate;}
+@keyframes timerWarn{from{opacity:1}to{opacity:.5}}
+.quiz-prog-bar-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:14px 22px;display:flex;align-items:center;gap:16px;margin-bottom:18px;}
+.qpb{flex:1;height:9px;background:var(--border);border-radius:5px;overflow:hidden;}
+.qpb-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--green-mid));border-radius:5px;transition:width .4s ease;}
+.qpb-info{display:flex;align-items:center;gap:16px;}
+.qpb-txt{font-size:12px;font-family:var(--mono);color:var(--muted);white-space:nowrap;}
+.q-grid{display:flex;gap:4px;flex-wrap:wrap;max-width:300px;}
+.q-dot{width:20px;height:20px;border-radius:5px;cursor:pointer;font-size:9px;font-family:var(--mono);display:flex;align-items:center;justify-content:center;border:1.5px solid var(--border);color:var(--muted);transition:all .12s;}
+.q-dot.answered{background:var(--green);border-color:var(--green);color:#fff;}
+.q-dot.current{border-color:var(--navy);color:var(--navy);font-weight:700;}
+.q-dot.flagged{background:var(--gold-light);border-color:var(--gold);color:var(--gold-dark);}
+.aq-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:28px;}
+.aq-meta-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.aq-num{font-size:11px;color:var(--muted);font-family:var(--mono);}
+.aq-text{font-size:16px;font-weight:600;color:var(--navy);line-height:1.65;margin-bottom:22px;}
+.aq-opts{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;}
+.aq-opt{display:flex;align-items:center;gap:14px;padding:13px 16px;border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .18s;background:var(--white);}
+.aq-opt:hover{border-color:var(--green);background:var(--green-light);}
+.aq-opt.selected{border-color:var(--green);background:var(--green-light);}
+.aq-opt.correct{border-color:#10B981;background:#D1FAE5;}
+.aq-opt.wrong{border-color:var(--red);background:var(--red-light);}
+.opt-letter{width:30px;height:30px;border-radius:8px;background:var(--surface);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:var(--mono);flex-shrink:0;transition:all .18s;}
+.aq-opt.selected .opt-letter{background:var(--green);border-color:var(--green);color:#fff;}
+.aq-opt.correct .opt-letter{background:#10B981;border-color:#10B981;color:#fff;}
+.aq-opt.wrong .opt-letter{background:var(--red);border-color:var(--red);color:#fff;}
+.opt-text{font-size:13px;font-weight:500;line-height:1.4;}
+.aq-nav-row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.aq-nav-center{display:flex;gap:8px;}
+
+/* ===== SUBJECTS EXPLORER ===== */
+.level-tabs{display:flex;gap:8px;margin-bottom:22px;}
+.lvl-tab{padding:8px 20px;border-radius:20px;border:2px solid var(--border);background:none;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:all .18s;color:var(--muted);}
+.lvl-tab:hover{border-color:var(--green);color:var(--green);}
+.lvl-tab.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.subjects-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.subj-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.subj-card:hover{border-color:var(--green);box-shadow:var(--shadow);transform:translateY(-2px);}
+.subj-card::before{content:'';position:absolute;bottom:-20px;right:-20px;width:70px;height:70px;border-radius:50%;background:var(--green-light);opacity:.5;}
+.subj-icon{font-size:28px;margin-bottom:12px;position:relative;z-index:1;}
+.subj-name{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:3px;position:relative;z-index:1;}
+.subj-count{font-size:11px;color:var(--muted);position:relative;z-index:1;}
+.subj-pbar{height:4px;background:var(--border);border-radius:2px;margin-top:12px;overflow:hidden;position:relative;z-index:1;}
+.subj-pbar-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--green-mid));border-radius:2px;}
+.subj-actions{display:flex;gap:6px;margin-top:10px;position:relative;z-index:1;}
+
+/* ===== ASSIGNMENT ===== */
+.assign-item{border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:10px;background:var(--white);transition:border .18s;}
+.assign-item:hover{border-color:var(--green-mid);}
+.assign-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.assign-title{font-size:14px;font-weight:700;color:var(--navy);flex:1;}
+.assign-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px;}
+.assign-meta span{font-size:11px;color:var(--muted);}
+.assign-prog{display:flex;align-items:center;gap:10px;}
+.assign-prog .bar{flex:1;height:7px;background:var(--border);border-radius:4px;overflow:hidden;}
+.assign-prog .bar-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--green-mid));border-radius:4px;}
+.assign-prog .pct{font-size:11px;font-family:var(--mono);color:var(--muted);}
+
+/* ===== RESULTS ===== */
+.result-hero{background:linear-gradient(135deg,var(--navy),var(--navy-light));color:#fff;border-radius:var(--radius-lg);padding:36px;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;margin-bottom:22px;position:relative;overflow:hidden;}
+.result-hero::before{content:'🎓';position:absolute;right:180px;top:50%;transform:translateY(-50%);font-size:100px;opacity:.06;}
+.result-score-big{font-size:72px;font-weight:800;font-family:var(--mono);color:var(--gold);line-height:1;}
+.result-grade{font-size:22px;font-weight:800;margin-bottom:6px;}
+.result-details{font-size:13px;color:rgba(255,255,255,.65);}
+.result-rank{text-align:center;background:rgba(255,255,255,0.1);border-radius:var(--radius);padding:20px 28px;}
+.result-rank .rank-val{font-size:36px;font-weight:800;font-family:var(--mono);color:var(--gold);}
+.result-rank .rank-lbl{font-size:11px;color:rgba(255,255,255,.6);margin-top:2px;}
+.result-stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px;}
+.res-stat{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px;text-align:center;}
+.rs-val{font-size:26px;font-weight:800;font-family:var(--mono);}
+.rs-val.green{color:var(--green);}
+.rs-val.red{color:var(--red);}
+.rs-val.gold{color:var(--gold);}
+.rs-val.blue{color:var(--blue);}
+.rs-lbl{font-size:11px;color:var(--muted);margin-top:4px;}
+
+/* ===== AI PANEL ===== */
+.ai-panel{background:linear-gradient(135deg,rgba(15,155,106,0.04),rgba(26,37,69,0.03));border:1.5px solid rgba(15,155,106,0.2);border-radius:var(--radius-lg);padding:26px;margin-bottom:22px;}
+.ai-panel-header{display:flex;align-items:center;gap:14px;margin-bottom:22px;}
+.ai-badge{background:linear-gradient(135deg,var(--green),var(--green-mid));color:#fff;font-size:10px;font-weight:700;padding:5px 12px;border-radius:20px;letter-spacing:.8px;display:flex;align-items:center;gap:5px;}
+.ai-panel-title{font-size:16px;font-weight:800;color:var(--navy);}
+.ai-panel-sub{font-size:12px;color:var(--muted);margin-top:1px;}
+.thinking-bar{display:flex;align-items:center;gap:10px;padding:14px 16px;background:var(--surface);border-radius:9px;margin-top:14px;border:1px solid var(--border);}
+.thinking-dots{display:flex;gap:5px;}
+.td{width:7px;height:7px;border-radius:50%;background:var(--green);}
+.td:nth-child(1){animation:bounce .9s infinite .0s;}
+.td:nth-child(2){animation:bounce .9s infinite .15s;}
+.td:nth-child(3){animation:bounce .9s infinite .3s;}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-7px)}}
+.thinking-txt{font-size:12px;color:var(--muted);font-style:italic;}
+
+/* ===== QUESTION ITEMS ===== */
+.q-item{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:16px 18px;transition:border .18s;}
+.q-item:hover{border-color:var(--green-mid);}
+.q-item-meta{display:flex;align-items:center;gap:7px;margin-bottom:10px;flex-wrap:wrap;}
+.q-item-text{font-size:13px;font-weight:600;color:var(--navy);line-height:1.55;margin-bottom:12px;}
+.q-item-opts{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;}
+.q-opt{font-size:12px;padding:7px 11px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--text);}
+.q-opt.correct{background:#D1FAE5;border-color:#6EE7B7;color:#065F46;font-weight:600;}
+.q-item-actions{display:flex;gap:7px;flex-wrap:wrap;}
+.q-act{font-size:11px;padding:5px 11px;border-radius:6px;border:1px solid var(--border);background:none;cursor:pointer;color:var(--muted);font-family:var(--font);font-weight:500;transition:all .15s;}
+.q-act:hover{background:var(--green);color:#fff;border-color:var(--green);}
+.q-act.danger:hover{background:var(--red);border-color:var(--red);}
+
+/* ===== EXAM LIST ===== */
+.exam-item{border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:10px;background:var(--white);display:flex;align-items:center;gap:14px;transition:border .18s;}
+.exam-item:hover{border-color:var(--green-mid);}
+.exam-item-info{flex:1;}
+.exam-item-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px;}
+.exam-item-chips{display:flex;gap:6px;flex-wrap:wrap;}
+.exam-item-actions{display:flex;gap:7px;}
+.exam-status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.esd-active{background:var(--green);animation:blink 1.5s infinite;}
+.esd-ended{background:var(--hint);}
+.esd-upcoming{background:var(--gold);}
+
+/* ===== MODAL OVERLAY ===== */
+.modal-overlay{position:fixed;inset:0;background:rgba(26,37,69,0.55);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--white);border-radius:var(--radius-lg);width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-md);transform:scale(.95);transition:transform .2s;}
+.modal-overlay.open .modal{transform:scale(1);}
+.modal-head{padding:22px 26px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;}
+.modal-title{font-size:17px;font-weight:800;color:var(--navy);}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);line-height:1;padding:0;}
+.modal-body{padding:22px 26px;}
+.modal-footer{padding:0 26px 22px;display:flex;justify-content:flex-end;gap:10px;}
+
+/* ===== TOAST ===== */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:#fff;padding:13px 20px;border-radius:10px;font-size:13px;font-weight:500;opacity:0;transform:translateY(12px);transition:all .28s;z-index:9999;display:flex;align-items:center;gap:9px;max-width:340px;box-shadow:var(--shadow-md);}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast .t-icon{font-size:16px;}
+.toast .t-close{background:none;border:none;color:rgba(255,255,255,.6);cursor:pointer;font-size:16px;margin-left:6px;}
+
+/* ===== EMPTY STATE ===== */
+.empty-state{text-align:center;padding:60px 24px;}
+.empty-icon{font-size:52px;margin-bottom:16px;}
+.empty-title{font-size:17px;font-weight:700;color:var(--navy);margin-bottom:8px;}
+.empty-sub{font-size:13px;color:var(--muted);line-height:1.6;max-width:300px;margin:0 auto 20px;}
+
+/* ===== UTILITY ===== */
+.flex{display:flex;}.flex-row{display:flex;align-items:center;}.gap6{gap:6px;}.gap10{gap:10px;}.gap14{gap:14px;}.spacer{flex:1;}.w100{width:100%;}
+.mt8{margin-top:8px;}.mt12{margin-top:12px;}.mt16{margin-top:16px;}.mt20{margin-top:20px;}.mt24{margin-top:24px;}
+.mb8{margin-bottom:8px;}.mb12{margin-bottom:12px;}.mb16{margin-bottom:16px;}.mb20{margin-bottom:20px;}.mb24{margin-bottom:24px;}
+.fw7{font-weight:700;}.fw8{font-weight:800;}.mono{font-family:var(--mono);}
+.text-muted{color:var(--muted);}.text-navy{color:var(--navy);}.text-green{color:var(--green);}.text-gold{color:var(--gold);}.text-red{color:var(--red);}
+.text-sm{font-size:12px;}.text-xs{font-size:11px;}.text-lg{font-size:16px;}
+.hidden{display:none!important;}
+.divider{height:1px;background:var(--border);margin:16px 0;}
+.scroll-x{overflow-x:auto;}
+.two-col{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;}
+.mini-lb-list{display:flex;flex-direction:column;gap:8px;}
+.mini-lb-item{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--surface);border-radius:9px;}
+.mini-lb-name{flex:1;font-size:13px;font-weight:500;}
+.mini-lb-score{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--green);}
+.mini-lb-bar-wrap{flex:1;}
+.mini-lb-bar{height:4px;background:var(--border);border-radius:2px;margin-top:3px;overflow:hidden;}
+.mini-lb-bar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--green),var(--green-mid));transition:width 1.2s ease;}
+.nerdc-banner{background:linear-gradient(135deg,var(--navy),var(--navy-light));color:#fff;border-radius:var(--radius-lg);padding:22px 28px;margin-bottom:22px;display:flex;align-items:center;gap:20px;}
+.nerdc-banner-icon{font-size:44px;flex-shrink:0;}
+.nerdc-banner h2{font-size:18px;font-weight:800;margin-bottom:4px;}
+.nerdc-banner p{font-size:12px;color:rgba(255,255,255,.65);line-height:1.6;}
+.nerdc-banner .banner-chips{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.banner-chip{background:rgba(255,255,255,.1);color:rgba(255,255,255,.85);font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;}
+.quick-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
+.qa-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px;cursor:pointer;text-align:center;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.qa-card:hover{border-color:var(--green);box-shadow:var(--shadow);transform:translateY(-2px);}
+.qa-card .qa-icon{font-size:26px;}
+.qa-card .qa-lbl{font-size:12px;font-weight:700;color:var(--navy);}
+.qa-card .qa-sub{font-size:10px;color:var(--muted);}
+
+/* ===== NOTIFICATIONS ===== */
+.notif-dot{position:absolute;top:5px;right:8px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1.5px solid var(--white);}
+.online-count{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--green);font-weight:600;background:var(--green-light);padding:4px 10px;border-radius:20px;font-family:var(--mono);}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--border-dark);}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ===== TOP BAR ===== -->
+<div class="topbar">
+  <div class="topbar-logo">
+    <div class="logo-mark">J</div>
+    <div>
+      <div class="logo-text">Jim<span>bana</span></div>
+      <div class="logo-tagline">NERDC Examination Platform</div>
+    </div>
+  </div>
+  <div class="topbar-nav">
+    <button class="tnav active" onclick="nav('dashboard',this)">🏠 Dashboard</button>
+    <button class="tnav" onclick="nav('aibank',this)">🤖 AI Questions</button>
+    <button class="tnav" onclick="nav('exams',this)">📝 Exams</button>
+    <button class="tnav" onclick="nav('leaderboard',this)">🏆 Leaderboard</button>
+    <button class="tnav" onclick="nav('subjects',this)">📚 Subjects</button>
+    <button class="tnav" onclick="nav('assignments',this)">📋 Assignments</button>
+    <button class="tnav" onclick="nav('quiz',this)">▶ Take Quiz</button>
+    <button class="tnav" onclick="nav('results',this)">📊 Results</button>
+  </div>
+  <div class="topbar-right">
+    <div class="live-badge"><div class="live-dot"></div><span id="live-count">12 LIVE</span></div>
+    <div class="topbar-user"><strong id="tb-user-name">Administrator</strong><span id="tb-user-role">Super Admin</span></div>
+    <div class="topbar-avatar" onclick="openModal('profile-modal')" title="Profile">AD</div>
+  </div>
+</div>
+
+<div class="main">
+<!-- ===== SIDEBAR ===== -->
+<div class="sidebar">
+  <div class="sb-section">Main</div>
+  <button class="sitem active" id="si-dashboard" onclick="nav('dashboard')"><span class="si">🏠</span>Dashboard</button>
+  <button class="sitem" id="si-aibank" onclick="nav('aibank')"><span class="si">🤖</span>AI Question Bank</button>
+  <button class="sitem" id="si-exams" onclick="nav('exams')"><span class="si">📝</span>Exam Manager</button>
+  <button class="sitem" id="si-leaderboard" onclick="nav('leaderboard')"><span class="si">🏆</span>Live Leaderboard<span class="sb red" id="sb-live">12</span></button>
+  <div class="sb-section">Learning</div>
+  <button class="sitem" id="si-subjects" onclick="nav('subjects')"><span class="si">📚</span>NERDC Subjects</button>
+  <button class="sitem" id="si-assignments" onclick="nav('assignments')"><span class="si">📋</span>Assignments<span class="sb gold" id="sb-assign">5</span></button>
+  <button class="sitem" id="si-quiz" onclick="nav('quiz')"><span class="si">▶</span>Take a Quiz</button>
+  <button class="sitem" id="si-results" onclick="nav('results')"><span class="si">📊</span>Results & Reports</button>
+  <div class="sb-section">Management</div>
+  <button class="sitem" id="si-learners" onclick="nav('learners')"><span class="si">👥</span>Learners</button>
+  <button class="sitem" id="si-analytics" onclick="nav('analytics')"><span class="si">📈</span>Analytics</button>
+  <button class="sitem" id="si-settings" onclick="nav('settings')"><span class="si">⚙️</span>Settings</button>
+  <div class="sb-divider"></div>
+  <button class="sitem" onclick="openModal('help-modal')"><span class="si">❓</span>Help & Docs</button>
+  <button class="sitem" onclick="showToast('Logged out successfully','🔒')"><span class="si">🔒</span>Logout</button>
+</div>
+
+<!-- ===== CONTENT AREA ===== -->
+<div class="content" id="content">
+
+<!-- =========================================
+     PAGE: DASHBOARD
+     ========================================= -->
+<div class="page active" id="page-dashboard">
+  <div class="page-header">
+    <div class="page-title">Welcome back, Administrator 👋</div>
+    <div class="page-sub">NERDC-aligned real-time quiz and examination management platform</div>
+  </div>
+
+  <div class="nerdc-banner">
+    <div class="nerdc-banner-icon">🇳🇬</div>
+    <div>
+      <h2>NERDC Curriculum Aligned</h2>
+      <p>All questions, exams and assignments are strictly aligned to the National Educational Research and Development Council curriculum for Nigerian schools.</p>
+      <div class="banner-chips">
+        <span class="banner-chip">Primary 1–6</span>
+        <span class="banner-chip">JSS 1–3</span>
+        <span class="banner-chip">SS 1–3</span>
+        <span class="banner-chip">50+ Subjects</span>
+        <span class="banner-chip">14,920+ Questions</span>
+        <span class="banner-chip">AI-Powered</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card sc-green">
+      <div class="stat-icon">👥</div>
+      <div class="stat-lbl">Total Learners</div>
+      <div class="stat-val" id="st-learners">1,284</div>
+      <div class="stat-change up">↑ 48 enrolled this week</div>
+    </div>
+    <div class="stat-card sc-gold">
+      <div class="stat-icon">📝</div>
+      <div class="stat-lbl">Active Exams</div>
+      <div class="stat-val" id="st-exams">7</div>
+      <div class="stat-change up">↑ 3 started today</div>
+    </div>
+    <div class="stat-card sc-blue">
+      <div class="stat-icon">🗃️</div>
+      <div class="stat-lbl">Questions in Bank</div>
+      <div class="stat-val" id="st-questions">14,920</div>
+      <div class="stat-change up">↑ 320 added via AI</div>
+    </div>
+    <div class="stat-card sc-red">
+      <div class="stat-icon">📋</div>
+      <div class="stat-lbl">Pending Assignments</div>
+      <div class="stat-val" id="st-pending">89</div>
+      <div class="stat-change dn">↓ 12 overdue</div>
+    </div>
+  </div>
+
+  <div class="quick-actions">
+    <div class="qa-card" onclick="nav('aibank')"><div class="qa-icon">🤖</div><div class="qa-lbl">AI Generate Questions</div><div class="qa-sub">NERDC-aligned only</div></div>
+    <div class="qa-card" onclick="nav('exams')"><div class="qa-icon">📝</div><div class="qa-lbl">Create New Exam</div><div class="qa-sub">Set time, topics & rules</div></div>
+    <div class="qa-card" onclick="nav('assignments')"><div class="qa-icon">📋</div><div class="qa-lbl">Assign to Learners</div><div class="qa-sub">Class or individual</div></div>
+    <div class="qa-card" onclick="nav('leaderboard')"><div class="qa-icon">🏆</div><div class="qa-lbl">Live Leaderboard</div><div class="qa-sub" id="qa-live-sub">12 active now</div></div>
+    <div class="qa-card" onclick="nav('quiz')"><div class="qa-icon">▶️</div><div class="qa-lbl">Start Practice Quiz</div><div class="qa-sub">Instant mode</div></div>
+    <div class="qa-card" onclick="nav('results')"><div class="qa-icon">📊</div><div class="qa-lbl">View Reports</div><div class="qa-sub">Analytics & insights</div></div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">Recent Activity <div class="ct-right"><div class="online-count" id="online-ind">● 12 online</div></div></div>
+      <div class="activity-list" id="activity-feed">
+        <div class="a-item"><div class="a-icon green">📝</div><div class="a-info"><strong>JSS2 Mathematics Exam — Live</strong><span>42 learners currently taking the examination</span></div><div class="a-time">Now</div></div>
+        <div class="a-item"><div class="a-icon gold">🏆</div><div class="a-info"><strong>Amara Okonkwo scored 98%</strong><span>SS3 English Language — topped leaderboard</span></div><div class="a-time">4m</div></div>
+        <div class="a-item"><div class="a-icon blue">📋</div><div class="a-info"><strong>Physics Assignment sent</strong><span>SS1A, SS1B — 60 learners notified</span></div><div class="a-time">18m</div></div>
+        <div class="a-item"><div class="a-icon green">🤖</div><div class="a-info"><strong>AI generated 40 questions</strong><span>Primary 5 Basic Science, Medium difficulty</span></div><div class="a-time">1h</div></div>
+        <div class="a-item"><div class="a-icon gold">👥</div><div class="a-info"><strong>New learner batch enrolled</strong><span>JSS1 — 28 students added by teacher</span></div><div class="a-time">2h</div></div>
+        <div class="a-item"><div class="a-icon blue">📊</div><div class="a-info"><strong>SS2 Chemistry exam graded</strong><span>35 submissions auto-marked, reports ready</span></div><div class="a-time">3h</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Today's Top Scorers <div class="ct-right"><span class="chip green">Updated live</span></div></div>
+      <div class="mini-lb-list" id="mini-lb"></div>
+    </div>
+  </div>
+
+  <div class="three-col mt20">
+    <div class="card">
+      <div class="card-title">Exams by Level</div>
+      <div style="display:flex;flex-direction:column;gap:12px;" id="exams-by-level">
+        <div><div class="flex-row gap10 mb8"><span class="chip blue">Primary</span><span class="spacer"></span><span class="mono text-sm">3 exams</span></div><div class="prog-mini"><div class="prog-mini-fill" style="width:45%"></div></div></div>
+        <div><div class="flex-row gap10 mb8"><span class="chip gold">JSS</span><span class="spacer"></span><span class="mono text-sm">6 exams</span></div><div class="prog-mini"><div class="prog-mini-fill" style="width:70%"></div></div></div>
+        <div><div class="flex-row gap10 mb8"><span class="chip purple">SSS</span><span class="spacer"></span><span class="mono text-sm">8 exams</span></div><div class="prog-mini"><div class="prog-mini-fill" style="width:90%"></div></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Pass Rate Today</div>
+      <div style="text-align:center;padding:10px 0;">
+        <div style="font-size:52px;font-weight:800;font-family:var(--mono);color:var(--green);">78%</div>
+        <div class="text-muted text-sm mt8">Across all active exams</div>
+        <div class="flex-row gap10 mt16" style="justify-content:center;">
+          <div style="text-align:center;"><div class="mono fw7 text-green" style="font-size:18px;">312</div><div class="text-xs text-muted">Passed</div></div>
+          <div style="width:1px;height:30px;background:var(--border);"></div>
+          <div style="text-align:center;"><div class="mono fw7 text-red" style="font-size:18px;">88</div><div class="text-xs text-muted">Failed</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">AI Usage Today</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div><div class="flex-row gap10 mb8"><span class="text-xs text-muted">Questions Generated</span><span class="spacer"></span><span class="mono fw7 text-green">340</span></div><div class="prog-mini"><div class="prog-mini-fill" style="width:68%"></div></div></div>
+        <div><div class="flex-row gap10 mb8"><span class="text-xs text-muted">Exams Created via AI</span><span class="spacer"></span><span class="mono fw7 text-gold">12</span></div><div class="prog-mini"><div class="prog-mini-fill" style="width:40%"></div></div></div>
+        <div><div class="flex-row gap10 mb8"><span class="text-xs text-muted">AI Auto-Graded</span><span class="spacer"></span><span class="mono fw7 text-blue">210</span></div><div class="prog-mini"><div class="prog-mini-fill" style="width:84%"></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================
+     PAGE: AI QUESTION BANK
+     ========================================= -->
+<div class="page hidden" id="page-aibank">
+  <div class="page-header">
+    <div class="page-title">🤖 AI Question Bank</div>
+    <div class="page-sub">Generate, search and manage NERDC curriculum questions using AI — all content is curriculum-bound</div>
+  </div>
+
+  <div class="ai-panel">
+    <div class="ai-panel-header">
+      <div class="ai-badge">✦ NERDC AI ENGINE</div>
+      <div>
+        <div class="ai-panel-title">Generate Questions from NERDC Curriculum</div>
+        <div class="ai-panel-sub">AI is restricted to NERDC-approved topics only. No off-curriculum content will be generated.</div>
+      </div>
+    </div>
+    <div class="form-row col4 mb16">
+      <div class="form-group"><div class="form-label">School Level</div>
+        <select class="form-input" id="ai-level" onchange="aiUpdateSubjects()">
+          <option value="">Select level...</option>
+          <option value="primary">Primary (1–6)</option>
+          <option value="jss">Junior Secondary (JSS1–3)</option>
+          <option value="sss">Senior Secondary (SS1–3)</option>
+        </select></div>
+      <div class="form-group"><div class="form-label">Class / Grade</div>
+        <select class="form-input" id="ai-class"><option value="">Select class...</option></select></div>
+      <div class="form-group"><div class="form-label">Subject</div>
+        <select class="form-input" id="ai-subject"><option value="">Select subject...</option></select></div>
+      <div class="form-group"><div class="form-label">No. of Questions</div>
+        <input type="number" class="form-input" id="ai-count" value="10" min="1" max="100"></div>
+    </div>
+    <div class="form-row col4 mb16">
+      <div class="form-group"><div class="form-label">Difficulty</div>
+        <select class="form-input" id="ai-diff"><option>Mixed</option><option>Easy</option><option>Medium</option><option>Hard</option></select></div>
+      <div class="form-group"><div class="form-label">Question Type</div>
+        <select class="form-input" id="ai-type"><option>Multiple Choice (MCQ)</option><option>True/False</option><option>Fill in the Blank</option><option>Theory</option><option>Mixed Types</option></select></div>
+      <div class="form-group"><div class="form-label">Topic / Term Focus</div>
+        <input type="text" class="form-input" id="ai-topic" placeholder="e.g. Quadratic equations, First term..."></div>
+      <div class="form-group"><div class="form-label" style="opacity:0;">.</div>
+        <button class="btn btn-primary w100" onclick="runAIGenerate()">✦ Generate Questions</button></div>
+    </div>
+    <div id="ai-thinking"></div>
+  </div>
+
+  <div id="ai-results-area" class="hidden">
+    <div class="flex-row gap10 mb16">
+      <div style="font-size:15px;font-weight:800;color:var(--navy);">Generated Questions <span id="ai-result-label" class="text-muted" style="font-weight:400;font-size:13px;"></span></div>
+      <span class="spacer"></span>
+      <button class="btn btn-secondary btn-sm" onclick="showToast('All questions saved to bank','🗃️')">🗃️ Add All to Bank</button>
+      <button class="btn btn-primary btn-sm" onclick="nav('exams')">Create Exam from These →</button>
+    </div>
+    <div class="flex flex-col gap10" id="ai-q-list"></div>
+  </div>
+
+  <div class="card mt24">
+    <div class="card-title">Question Bank Overview
+      <div class="ct-right">
+        <input type="text" class="form-input" style="width:220px;padding:6px 10px;font-size:12px;" placeholder="🔍 Search questions...">
+        <select class="form-input" style="width:140px;padding:6px 10px;font-size:12px;"><option>All Levels</option><option>Primary</option><option>JSS</option><option>SSS</option></select>
+      </div>
+    </div>
+    <div class="scroll-x">
+      <table class="tbl">
+        <thead><tr><th>#</th><th>Question Preview</th><th>Subject</th><th>Level</th><th>Class</th><th>Type</th><th>Difficulty</th><th>Actions</th></tr></thead>
+        <tbody id="bank-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================
+     PAGE: EXAM MANAGER
+     ========================================= -->
+<div class="page hidden" id="page-exams">
+  <div class="page-header">
+    <div class="page-title">📝 Exam Manager</div>
+    <div class="page-sub">Create, configure, publish and monitor NERDC-based examinations</div>
+  </div>
+
+  <div class="card mb20">
+    <div class="card-title">Create New Exam</div>
+    <div class="form-row col3 mb16">
+      <div class="form-group span2"><div class="form-label">Exam Title</div><input type="text" class="form-input" id="exam-title" placeholder="e.g. JSS2 First Term Mathematics Examination"></div>
+      <div class="form-group"><div class="form-label">Academic Term</div><select class="form-input"><option>First Term</option><option>Second Term</option><option>Third Term</option></select></div>
+    </div>
+    <div class="form-row col4 mb16">
+      <div class="form-group"><div class="form-label">School Level</div><select class="form-input" id="exam-level" onchange="examUpdateSubjects()"><option>Primary</option><option selected>Junior Secondary</option><option>Senior Secondary</option></select></div>
+      <div class="form-group"><div class="form-label">Class</div><select class="form-input" id="exam-class"><option>JSS 1</option><option selected>JSS 2</option><option>JSS 3</option></select></div>
+      <div class="form-group"><div class="form-label">Subject</div><select class="form-input"><option>Mathematics</option><option>English Language</option><option>Basic Science</option><option>Social Studies</option></select></div>
+      <div class="form-group"><div class="form-label">Total Questions</div><input type="number" class="form-input" value="40"></div>
+    </div>
+    <div class="form-row col4 mb16">
+      <div class="form-group"><div class="form-label">Duration (minutes)</div><input type="number" class="form-input" value="60"></div>
+      <div class="form-group"><div class="form-label">Pass Mark (%)</div><input type="number" class="form-input" value="50"></div>
+      <div class="form-group"><div class="form-label">Max Attempts</div><select class="form-input"><option>1 (once only)</option><option>2</option><option>3</option><option>Unlimited</option></select></div>
+      <div class="form-group"><div class="form-label">Shuffle Questions</div><select class="form-input"><option>Yes — randomise</option><option>No — fixed order</option></select></div>
+    </div>
+    <div class="form-row col3 mb16">
+      <div class="form-group"><div class="form-label">Start Date & Time</div><input type="datetime-local" class="form-input"></div>
+      <div class="form-group"><div class="form-label">End Date & Time</div><input type="datetime-local" class="form-input"></div>
+      <div class="form-group"><div class="form-label">Result Visibility</div><select class="form-input"><option>After Submission</option><option>After All Finish</option><option>Teacher Release Only</option></select></div>
+    </div>
+    <div class="form-row col3 mb20">
+      <div class="form-group"><div class="form-label">Show Correct Answers</div><select class="form-input"><option>After review by teacher</option><option>Immediately after submit</option><option>Never</option></select></div>
+      <div class="form-group"><div class="form-label">Anti-Cheat Mode</div><select class="form-input"><option>Full Screen Lock</option><option>Tab Switch Detection</option><option>Both</option><option>None</option></select></div>
+      <div class="form-group"><div class="form-label">Auto-Grade</div><select class="form-input"><option>Yes — instant</option><option>Manual grading</option></select></div>
+    </div>
+    <div class="flex-row gap10">
+      <button class="btn btn-secondary" onclick="showToast('Exam saved as draft','📄')">💾 Save Draft</button>
+      <button class="btn btn-primary" onclick="showToast('Exam published! All assigned learners notified.','🚀')">🚀 Publish Exam</button>
+      <button class="btn btn-gold" onclick="nav('assignments')">📋 Assign to Class →</button>
+      <span class="spacer"></span>
+      <button class="btn btn-secondary btn-sm" onclick="showToast('Exam preview opened','👁️')">👁 Preview</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">All Exams
+      <div class="ct-right">
+        <select class="form-input" style="width:130px;padding:6px 10px;font-size:12px;"><option>All Status</option><option>Active</option><option>Upcoming</option><option>Ended</option><option>Draft</option></select>
+        <select class="form-input" style="width:120px;padding:6px 10px;font-size:12px;"><option>All Levels</option><option>Primary</option><option>JSS</option><option>SSS</option></select>
+      </div>
+    </div>
+    <div id="exams-list-container"></div>
+  </div>
+</div>
+
+<!-- =========================================
+     PAGE: LIVE LEADERBOARD
+     ========================================= -->
+<div class="page hidden" id="page-leaderboard">
+  <div class="page-header">
+    <div class="page-title">🏆 Live Leaderboard</div>
+    <div class="page-sub">Real-time rankings updated as learners submit answers</div>
+  </div>
+
+  <div class="flex-row gap10 mb16">
+    <select class="form-input" style="width:320px;" id="lb-exam-select" onchange="switchLeaderboard(this.value)">
+      <option value="jss2math">JSS2 Mid-Term Mathematics — Live</option>
+      <option value="ss3chem">SS3 Chemistry Revision — Live</option>
+      <option value="pri5sci">Primary 5 Basic Science — Ended</option>
+    </select>
+    <div class="spacer"></div>
+    <div class="online-count" id="lb-online-ind">● 42 Active</div>
+    <button class="btn btn-secondary btn-sm" onclick="showToast('Leaderboard exported as PDF','📥')">📥 Export</button>
+  </div>
+
+  <div class="lb-panel">
+    <div class="lb-head">
+      <div class="lb-head-title" id="lb-exam-name">JSS2 Mid-Term Mathematics Examination</div>
+      <div class="lb-head-sub" id="lb-exam-sub">42 learners active · Started 09:15 AM · Ends in <span id="lb-countdown">38 mins</span></div>
+      <div class="lb-head-stats">
+        <div class="lb-head-stat"><div class="val" id="lbs-total">42</div><div class="lbl">Participants</div></div>
+        <div class="lb-head-stat"><div class="val" id="lbs-submitted">18</div><div class="lbl">Submitted</div></div>
+        <div class="lb-head-stat"><div class="val" id="lbs-avg">74%</div><div class="lbl">Avg Score</div></div>
+        <div class="lb-head-stat"><div class="val" id="lbs-top">98%</div><div class="lbl">Top Score</div></div>
+      </div>
+    </div>
+    <div class="lb-podium" id="lb-podium"></div>
+    <div class="scroll-x">
+      <table class="tbl lb-tbl" id="lb-table">
+        <thead><tr>
+          <th>Rank</th><th>Learner</th><th>Class</th><th>Score</th><th>Correct / Total</th><th>Time Used</th><th>Progress</th><th>Status</th>
+        </tr></thead>
+        <tbody id="lb-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================
+     PAGE: NERDC SUBJECTS
+     ========================================= -->
+<div class="page hidden" id="page-subjects">
+  <div class="page-header">
+    <div class="page-title">📚 NERDC Subjects</div>
+    <div class="page-sub">Complete NERDC curriculum coverage — Primary, Junior Secondary and Senior Secondary School</div>
+  </div>
+  <div class="level-tabs">
+    <button class="lvl-tab active" onclick="renderSubjects('primary',this)">Primary (1–6)</button>
+    <button class="lvl-tab" onclick="renderSubjects('jss',this)">Junior Secondary (JSS)</button>
+    <button class="lvl-tab" onclick="renderSubjects('sss',this)">Senior Secondary (SSS)</button>
+  </div>
+  <div class="subjects-grid" id="subj-grid"></div>
+</div>
+
+<!-- =========================================
+     PAGE: ASSIGNMENTS
+     ========================================= -->
+<div class="page hidden" id="page-assignments">
+  <div class="page-header">
+    <div class="page-title">📋 Assignment Manager</div>
+    <div class="page-sub">Assign exams to individual learners, entire classes, or school levels with scheduling</div>
+  </div>
+
+  <div class="card mb20">
+    <div class="card-title">Create New Assignment</div>
+    <div class="form-row col3 mb14">
+      <div class="form-group span2"><div class="form-label">Select Exam / Quiz</div>
+        <select class="form-input"><option>JSS2 Mid-Term Mathematics</option><option>SS1 Biology Quiz</option><option>Primary 5 Basic Science</option><option>SS3 Chemistry Revision</option></select></div>
+      <div class="form-group"><div class="form-label">Assign To</div>
+        <select class="form-input" id="assign-mode" onchange="toggleAssignMode()">
+          <option value="class">Entire Class</option>
+          <option value="level">School Level</option>
+          <option value="individual">Individual Learners</option>
+          <option value="group">Custom Group</option>
+        </select></div>
+    </div>
+    <div class="form-group mb14" id="assign-class-target">
+      <div class="form-label">Select Class(es)</div>
+      <div class="flex-row gap10" style="flex-wrap:wrap;padding:10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);">
+        <label class="flex-row gap6 text-sm"><input type="checkbox" checked> JSS 2A</label>
+        <label class="flex-row gap6 text-sm"><input type="checkbox"> JSS 2B</label>
+        <label class="flex-row gap6 text-sm"><input type="checkbox"> JSS 2C</label>
+        <label class="flex-row gap6 text-sm"><input type="checkbox"> JSS 1A</label>
+        <label class="flex-row gap6 text-sm"><input type="checkbox"> JSS 1B</label>
+        <label class="flex-row gap6 text-sm"><input type="checkbox"> SS 1A</label>
+        <label class="flex-row gap6 text-sm"><input type="checkbox"> SS 2B</label>
+        <label class="flex-row gap6 text-sm"><input type="checkbox"> Primary 5A</label>
+        <label class="flex-row gap6 text-sm"><input type="checkbox"> Primary 6A</label>
+      </div>
+    </div>
+    <div class="form-row col4 mb14">
+      <div class="form-group"><div class="form-label">Due Date</div><input type="date" class="form-input"></div>
+      <div class="form-group"><div class="form-label">Due Time</div><input type="time" class="form-input" value="23:59"></div>
+      <div class="form-group"><div class="form-label">Allow Late Submission</div><select class="form-input"><option>No</option><option>Yes — with score penalty</option><option>Yes — no penalty</option></select></div>
+      <div class="form-group"><div class="form-label">Notify Learners Via</div><select class="form-input"><option>In-app notification</option><option>Email</option><option>SMS</option><option>Email + SMS</option></select></div>
+    </div>
+    <div class="form-row col2 mb14">
+      <div class="form-group"><div class="form-label">Grading Weight</div><select class="form-input"><option>Counts toward final grade</option><option>Practice only — no grade</option><option>Bonus marks</option></select></div>
+      <div class="form-group"><div class="form-label">Revision Allowed Before Deadline</div><select class="form-input"><option>Yes — learner can retake</option><option>No — single submission</option></select></div>
+    </div>
+    <div class="form-group mb16"><div class="form-label">Instructions / Note to Learners (optional)</div>
+      <textarea class="form-input" rows="2" placeholder="e.g. This exam covers topics from Week 1–6. Ensure you have a calculator and formula sheet ready."></textarea></div>
+    <div class="flex-row gap10">
+      <button class="btn btn-secondary" onclick="showToast('Assignment saved as draft','📄')">💾 Save Draft</button>
+      <button class="btn btn-primary" onclick="showToast('Assignment sent! Learners have been notified.','📤')">📤 Send Assignment</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Active Assignments <div class="ct-right"><span class="chip red">5 pending</span></div></div>
+    <div id="assignment-list-container"></div>
+  </div>
+</div>
+
+<!-- =========================================
+     PAGE: TAKE A QUIZ
+     ========================================= -->
+<div class="page hidden" id="page-quiz">
+  <div class="quiz-shell">
+    <div class="quiz-topbar">
+      <div class="quiz-info">
+        <div class="qi-meta" id="qz-meta">JSS2 Mathematics · 40 Questions · Shuffle ON · NERDC Aligned</div>
+        <div class="qi-name" id="qz-name">Mid-Term Mathematics Examination</div>
+      </div>
+      <div class="quiz-timer-block">
+        <div class="quiz-timer-lbl">TIME REMAINING</div>
+        <div class="quiz-timer" id="qz-timer">59:00</div>
+      </div>
+    </div>
+    <div class="quiz-prog-bar-wrap">
+      <div style="font-size:13px;font-weight:700;color:var(--navy);">Question <span id="qz-curr">1</span> of <span id="qz-total">40</span></div>
+      <div class="qpb"><div class="qpb-fill" id="qz-bar" style="width:2.5%"></div></div>
+      <div class="qpb-info">
+        <span class="qpb-txt" id="qz-pct">1 / 40</span>
+        <button class="btn btn-secondary btn-sm" onclick="showToast('Question flagged for review','🚩')">🚩 Flag</button>
+        <button class="btn btn-secondary btn-sm" onclick="submitExam()">🏁 Submit Exam</button>
+      </div>
+    </div>
+    <div class="aq-card" id="qz-active-q"></div>
+  </div>
+</div>
+
+<!-- =========================================
+     PAGE: RESULTS & REPORTS
+     ========================================= -->
+<div class="page hidden" id="page-results">
+  <div class="page-header">
+    <div class="page-title">📊 Results & Reports</div>
+    <div class="page-sub">Detailed performance analytics, grade reports and insights</div>
+  </div>
+
+  <div class="result-hero">
+    <div>
+      <div style="font-size:11px;color:rgba(255,255,255,.55);margin-bottom:6px;font-family:var(--mono);">LATEST RESULT · JSS2 Mid-Term Mathematics · Amara Okonkwo</div>
+      <div class="result-score-big">87%</div>
+      <div class="result-grade">Distinction — Excellent Performance</div>
+      <div class="result-details">35 of 40 questions correct · Completed in 44 mins 18 secs · Class of 42</div>
+    </div>
+    <div class="result-rank">
+      <div class="rank-val">#1</div>
+      <div class="rank-lbl">Class Rank</div>
+    </div>
+  </div>
+
+  <div class="result-stats-row">
+    <div class="res-stat"><div class="rs-val green">35</div><div class="rs-lbl">Correct Answers</div></div>
+    <div class="res-stat"><div class="rs-val red">5</div><div class="rs-lbl">Wrong Answers</div></div>
+    <div class="res-stat"><div class="rs-val gold">44:18</div><div class="rs-lbl">Time Taken</div></div>
+    <div class="res-stat"><div class="rs-val blue">87.5%</div><div class="rs-lbl">Percentage Score</div></div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">Performance by Topic</div>
+      <div id="topic-breakdown"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Grade Distribution — Class</div>
+      <div id="grade-distribution"></div>
+    </div>
+  </div>
+
+  <div class="card mt20">
+    <div class="card-title">All Exam Results
+      <div class="ct-right">
+        <input type="text" class="form-input" style="width:180px;padding:6px 10px;font-size:12px;" placeholder="Search learner...">
+        <button class="btn btn-secondary btn-sm" onclick="showToast('Exporting results as Excel','📥')">📥 Export Excel</button>
+        <button class="btn btn-secondary btn-sm" onclick="showToast('Generating PDF report','📄')">📄 PDF Report</button>
+      </div>
+    </div>
+    <div class="scroll-x">
+      <table class="tbl">
+        <thead><tr><th>Learner</th><th>Class</th><th>Exam</th><th>Score</th><th>Grade</th><th>Rank</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody id="results-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================
+     PAGE: LEARNERS
+     ========================================= -->
+<div class="page hidden" id="page-learners">
+  <div class="page-header">
+    <div class="page-title">👥 Learners</div>
+    <div class="page-sub">Manage all enrolled learners across Primary, Junior and Senior Secondary levels</div>
+  </div>
+  <div class="stats-row" style="grid-template-columns:repeat(3,1fr);">
+    <div class="stat-card sc-blue"><div class="stat-lbl">Primary Learners</div><div class="stat-val">412</div><div class="stat-change up">↑ 18 this term</div></div>
+    <div class="stat-card sc-gold"><div class="stat-lbl">JSS Learners</div><div class="stat-val">524</div><div class="stat-change up">↑ 22 this term</div></div>
+    <div class="stat-card sc-purple"><div class="stat-lbl">SSS Learners</div><div class="stat-val">348</div><div class="stat-change up">↑ 8 this term</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Learner Roster
+      <div class="ct-right">
+        <input type="text" class="form-input" style="width:200px;padding:6px 10px;font-size:12px;" placeholder="🔍 Search...">
+        <select class="form-input" style="width:140px;padding:6px 10px;font-size:12px;"><option>All Levels</option><option>Primary</option><option>JSS</option><option>SSS</option></select>
+        <select class="form-input" style="width:120px;padding:6px 10px;font-size:12px;"><option>All Classes</option><option>JSS 1</option><option>JSS 2</option><option>JSS 3</option></select>
+        <button class="btn btn-primary btn-sm" onclick="openModal('enrol-modal')">+ Enrol Learner</button>
+        <button class="btn btn-secondary btn-sm" onclick="showToast('CSV import dialog opened','⬆️')">⬆ Import CSV</button>
+      </div>
+    </div>
+    <div class="scroll-x">
+      <table class="tbl">
+        <thead><tr><th>Name</th><th>Learner ID</th><th>Class</th><th>Level</th><th>Avg Score</th><th>Exams Taken</th><th>Last Active</th><th>Actions</th></tr></thead>
+        <tbody id="learners-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================
+     PAGE: ANALYTICS
+     ========================================= -->
+<div class="page hidden" id="page-analytics">
+  <div class="page-header">
+    <div class="page-title">📈 Analytics & Insights</div>
+    <div class="page-sub">Deep performance data across subjects, levels and time periods</div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card sc-green"><div class="stat-lbl">Avg Score (All)</div><div class="stat-val">73%</div><div class="stat-change up">↑ 4% vs last term</div></div>
+    <div class="stat-card sc-blue"><div class="stat-lbl">Completion Rate</div><div class="stat-val">91%</div><div class="stat-change up">↑ 2%</div></div>
+    <div class="stat-card sc-gold"><div class="stat-lbl">Exams This Term</div><div class="stat-val">47</div><div class="stat-change up">↑ 12 vs last</div></div>
+    <div class="stat-card sc-purple"><div class="stat-lbl">Questions Answered</div><div class="stat-val">98k</div><div class="stat-change up">↑ 18%</div></div>
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">Subject Performance Rankings</div>
+      <div id="analytics-subjects"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Weekly Exam Activity</div>
+      <div id="analytics-weekly"></div>
+    </div>
+  </div>
+  <div class="card mt20">
+    <div class="card-title">Weak Areas — Needs Improvement</div>
+    <div id="analytics-weak"></div>
+  </div>
+</div>
+
+<!-- =========================================
+     PAGE: SETTINGS
+     ========================================= -->
+<div class="page hidden" id="page-settings">
+  <div class="page-header">
+    <div class="page-title">⚙️ Platform Settings</div>
+    <div class="page-sub">Configure Jimbana to suit your school's needs</div>
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">School Information</div>
+      <div class="form-row col2 mb14">
+        <div class="form-group span2"><div class="form-label">School Name</div><input type="text" class="form-input" value="Jimbana Academy"></div>
+        <div class="form-group"><div class="form-label">State</div><select class="form-input"><option>Lagos</option><option>Abuja (FCT)</option><option>Kano</option><option>Rivers</option></select></div>
+        <div class="form-group"><div class="form-label">School Type</div><select class="form-input"><option>Public</option><option>Private</option></select></div>
+      </div>
+      <div class="form-group mb14"><div class="form-label">School Address</div><input type="text" class="form-input" placeholder="Full address"></div>
+      <button class="btn btn-primary" onclick="showToast('School info saved','💾')">Save</button>
+    </div>
+    <div class="card">
+      <div class="card-title">Exam Defaults</div>
+      <div class="form-row col2 mb14">
+        <div class="form-group"><div class="form-label">Default Pass Mark (%)</div><input type="number" class="form-input" value="50"></div>
+        <div class="form-group"><div class="form-label">Default Duration (mins)</div><input type="number" class="form-input" value="60"></div>
+        <div class="form-group"><div class="form-label">Shuffle by Default</div><select class="form-input"><option>Yes</option><option>No</option></select></div>
+        <div class="form-group"><div class="form-label">Auto-Grade</div><select class="form-input"><option>Yes</option><option>No</option></select></div>
+      </div>
+      <button class="btn btn-primary" onclick="showToast('Exam defaults saved','💾')">Save</button>
+    </div>
+  </div>
+  <div class="two-col mt20">
+    <div class="card">
+      <div class="card-title">AI & Question Settings</div>
+      <div class="form-row col2 mb14">
+        <div class="form-group"><div class="form-label">Curriculum Restriction</div><select class="form-input"><option selected>NERDC Only (strict)</option></select></div>
+        <div class="form-group"><div class="form-label">Question Language</div><select class="form-input"><option>English</option><option>Hausa</option><option>Yoruba</option><option>Igbo</option></select></div>
+        <div class="form-group"><div class="form-label">Default Difficulty</div><select class="form-input"><option>Mixed</option><option>Easy</option><option>Medium</option><option>Hard</option></select></div>
+        <div class="form-group"><div class="form-label">Max AI Questions / Day</div><input type="number" class="form-input" value="500"></div>
+      </div>
+      <button class="btn btn-primary" onclick="showToast('AI settings saved','🤖')">Save</button>
+    </div>
+    <div class="card">
+      <div class="card-title">Notifications</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <label class="flex-row gap10"><input type="checkbox" checked><span class="text-sm">Notify learners when assigned</span></label>
+        <label class="flex-row gap10"><input type="checkbox" checked><span class="text-sm">Notify teachers when exam ends</span></label>
+        <label class="flex-row gap10"><input type="checkbox" checked><span class="text-sm">Leaderboard update alerts</span></label>
+        <label class="flex-row gap10"><input type="checkbox"><span class="text-sm">SMS notifications</span></label>
+        <label class="flex-row gap10"><input type="checkbox" checked><span class="text-sm">Email notifications</span></label>
+        <label class="flex-row gap10"><input type="checkbox" checked><span class="text-sm">Overdue assignment alerts</span></label>
+      </div>
+      <button class="btn btn-primary mt16" onclick="showToast('Notification settings saved','🔔')">Save</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- end content -->
+</div><!-- end main -->
+</div><!-- end app -->
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast">
+  <span class="t-icon" id="t-icon">✓</span>
+  <span id="t-msg"></span>
+  <button class="t-close" onclick="document.getElementById('toast').classList.remove('show')">×</button>
+</div>
+
+<!-- ===== MODALS ===== -->
+<div class="modal-overlay" id="profile-modal" onclick="if(event.target===this)closeModal('profile-modal')">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">My Profile</div><button class="modal-close" onclick="closeModal('profile-modal')">×</button></div>
+    <div class="modal-body">
+      <div class="flex-row gap14 mb16">
+        <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#E5890A);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;color:#fff;">AD</div>
+        <div><div style="font-size:17px;font-weight:800;color:var(--navy);">Administrator</div><div class="text-sm text-muted">Super Admin · Jimbana Academy</div><div class="mt8"><span class="chip green">Active</span></div></div>
+      </div>
+      <div class="form-row col2 mb14">
+        <div class="form-group"><div class="form-label">Full Name</div><input type="text" class="form-input" value="Platform Administrator"></div>
+        <div class="form-group"><div class="form-label">Email</div><input type="email" class="form-input" value="admin@jimbana.ng"></div>
+        <div class="form-group"><div class="form-label">Phone</div><input type="text" class="form-input" value="+234 800 000 0000"></div>
+        <div class="form-group"><div class="form-label">Role</div><select class="form-input"><option>Super Admin</option><option>Teacher</option><option>Examiner</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('profile-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="showToast('Profile updated','✓');closeModal('profile-modal')">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="enrol-modal" onclick="if(event.target===this)closeModal('enrol-modal')">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">Enrol New Learner</div><button class="modal-close" onclick="closeModal('enrol-modal')">×</button></div>
+    <div class="modal-body">
+      <div class="form-row col2 mb14">
+        <div class="form-group"><div class="form-label">First Name</div><input type="text" class="form-input" placeholder="First name"></div>
+        <div class="form-group"><div class="form-label">Last Name</div><input type="text" class="form-input" placeholder="Last name"></div>
+        <div class="form-group"><div class="form-label">Level</div><select class="form-input"><option>Primary</option><option>Junior Secondary</option><option>Senior Secondary</option></select></div>
+        <div class="form-group"><div class="form-label">Class</div><select class="form-input"><option>JSS 1A</option><option>JSS 2A</option><option>SS 1A</option><option>Primary 5A</option></select></div>
+        <div class="form-group"><div class="form-label">Date of Birth</div><input type="date" class="form-input"></div>
+        <div class="form-group"><div class="form-label">Gender</div><select class="form-input"><option>Male</option><option>Female</option></select></div>
+      </div>
+      <div class="form-group mb14"><div class="form-label">Parent / Guardian Email (for notifications)</div><input type="email" class="form-input" placeholder="parent@email.com"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('enrol-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="showToast('Learner enrolled and credentials sent','👤');closeModal('enrol-modal')">Enrol Learner</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="help-modal" onclick="if(event.target===this)closeModal('help-modal')">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">Help & Documentation</div><button class="modal-close" onclick="closeModal('help-modal')">×</button></div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="a-item"><div class="a-icon blue">🤖</div><div class="a-info"><strong>How to generate AI questions</strong><span>Guide to the NERDC AI question engine</span></div></div>
+        <div class="a-item"><div class="a-icon green">📝</div><div class="a-info"><strong>Creating and publishing exams</strong><span>Step-by-step exam setup guide</span></div></div>
+        <div class="a-item"><div class="a-icon gold">📋</div><div class="a-info"><strong>Assigning tests to learners</strong><span>Individual, class and level assignments</span></div></div>
+        <div class="a-item"><div class="a-icon blue">📊</div><div class="a-info"><strong>Reading results & reports</strong><span>Understanding analytics and grades</span></div></div>
+        <div class="a-item"><div class="a-icon green">👥</div><div class="a-info"><strong>Managing learners</strong><span>Enrolment, import and class management</span></div></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-primary" onclick="closeModal('help-modal')">Close</button></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const NERDC_SUBJECTS = {
+  primary:[
+    {n:'Mathematics',i:'🔢',q:1840,p:92},{n:'English Language',i:'📖',q:1620,p:86},
+    {n:'Basic Science & Technology',i:'🔬',q:980,p:74},{n:'Social Studies',i:'🌍',q:860,p:68},
+    {n:'Civic Education',i:'🏛️',q:720,p:60},{n:'Yoruba',i:'📜',q:540,p:45},
+    {n:'Hausa',i:'📜',q:510,p:42},{n:'Igbo',i:'📜',q:490,p:40},
+    {n:'Agricultural Science',i:'🌾',q:460,p:38},{n:'Creative Arts',i:'🎨',q:380,p:30},
+    {n:'CRS',i:'✝️',q:430,p:35},{n:'IRS',i:'☪️',q:420,p:34},
+  ],
+  jss:[
+    {n:'Mathematics',i:'🔢',q:2100,p:95},{n:'English Language',i:'📖',q:1900,p:90},
+    {n:'Basic Science',i:'🔬',q:1200,p:78},{n:'Social Studies',i:'🌍',q:1100,p:72},
+    {n:'Business Studies',i:'💼',q:880,p:62},{n:'Basic Technology',i:'🔧',q:940,p:66},
+    {n:'French Language',i:'🗺️',q:560,p:44},{n:'Computer Studies',i:'💻',q:780,p:58},
+    {n:'CRS',i:'✝️',q:510,p:40},{n:'IRS',i:'☪️',q:490,p:38},
+    {n:'Agricultural Science',i:'🌾',q:660,p:50},{n:'Home Economics',i:'🏠',q:440,p:36},
+    {n:'Civic Education',i:'🏛️',q:620,p:48},{n:'Physical Health Education',i:'⚽',q:380,p:30},
+    {n:'Fine Arts',i:'🎨',q:290,p:24},{n:'Music',i:'🎵',q:260,p:22},
+  ],
+  sss:[
+    {n:'Mathematics',i:'🔢',q:2400,p:98},{n:'English Language',i:'📖',q:2200,p:96},
+    {n:'Biology',i:'🧬',q:1800,p:88},{n:'Chemistry',i:'⚗️',q:1700,p:85},
+    {n:'Physics',i:'⚛️',q:1650,p:82},{n:'Economics',i:'📈',q:1400,p:76},
+    {n:'Geography',i:'🗺️',q:1100,p:70},{n:'Government',i:'🏛️',q:1050,p:68},
+    {n:'Accounts',i:'📒',q:960,p:64},{n:'Commerce',i:'💰',q:880,p:60},
+    {n:'Literature in English',i:'📚',q:740,p:52},{n:'Further Mathematics',i:'∞',q:620,p:46},
+    {n:'Agricultural Science',i:'🌾',q:700,p:54},{n:'Computer Science',i:'💻',q:840,p:60},
+    {n:'Technical Drawing',i:'📐',q:480,p:38},{n:'Food & Nutrition',i:'🍲',q:420,p:34},
+    {n:'CRS',i:'✝️',q:610,p:50},{n:'IRS',i:'☪️',q:580,p:46},
+    {n:'History',i:'📜',q:540,p:42},{n:'French Language',i:'🗺️',q:420,p:34},
+    {n:'Yoruba',i:'📜',q:380,p:30},{n:'Hausa',i:'📜',q:360,p:28},
+    {n:'Igbo',i:'📜',q:350,p:27},{n:'Financial Accounting',i:'💳',q:490,p:40},
+  ]
+};
+
+const AI_CLASS_MAP = {
+  primary:['Primary 1','Primary 2','Primary 3','Primary 4','Primary 5','Primary 6'],
+  jss:['JSS 1','JSS 2','JSS 3'],
+  sss:['SS 1','SS 2','SS 3']
+};
+
+const SAMPLE_QS = [
+  {t:'Which of the following best describes photosynthesis?',o:['Breakdown of glucose to release energy','Process of making food using sunlight, CO₂ and water','Absorption of water by roots','Division of plant cells'],a:1,s:'Biology',l:'SS 1',c:'Senior Secondary',d:'Medium'},
+  {t:'Simplify: 3x² + 5x − 2x² + 7x',o:['x² + 12x','5x² + 12x','x² − 2x','2x² + 2x'],a:0,s:'Mathematics',l:'JSS 2',c:'Junior Secondary',d:'Easy'},
+  {t:'The official language of Nigeria as stated in the 1999 Constitution is:',o:['Hausa','Yoruba','English','Igbo'],a:2,s:'Civic Education',l:'JSS 3',c:'Junior Secondary',d:'Easy'},
+  {t:'A body moving with uniform velocity has an acceleration of:',o:['Maximum','Minimum','Zero','Variable'],a:2,s:'Physics',l:'SS 2',c:'Senior Secondary',d:'Medium'},
+  {t:'The chemical symbol for Gold is:',o:['Go','Gd','Au','Ag'],a:2,s:'Chemistry',l:'SS 1',c:'Senior Secondary',d:'Easy'},
+  {t:'In a right-angled triangle, if the two legs are 3 and 4, the hypotenuse is:',o:['6','5','7','4.5'],a:1,s:'Mathematics',l:'Primary 6',c:'Primary',d:'Medium'},
+  {t:'Which organ pumps blood through the human body?',o:['Liver','Kidney','Lungs','Heart'],a:3,s:'Basic Science',l:'Primary 5',c:'Primary',d:'Easy'},
+  {t:'The demand curve normally slopes:',o:['Upward from left to right','Downward from left to right','Horizontally','Vertically'],a:1,s:'Economics',l:'SS 2',c:'Senior Secondary',d:'Medium'},
+];
+
+const LEARNERS_DATA = [
+  {n:'Amara Okonkwo',id:'JB-001',cls:'JSS 2A',lvl:'Junior Secondary',avg:92,tests:8,last:'2 hrs ago',score:98,status:'done'},
+  {n:'Ibrahim Musa',id:'JB-002',cls:'JSS 2B',lvl:'Junior Secondary',avg:84,tests:7,last:'Now',score:91,status:'active'},
+  {n:'Chisom Eze',id:'JB-003',cls:'JSS 2A',lvl:'Junior Secondary',avg:88,tests:9,last:'5m ago',score:88,status:'done'},
+  {n:'Fatima Bello',id:'JB-004',cls:'SS 1A',lvl:'Senior Secondary',avg:76,tests:5,last:'Now',score:85,status:'active'},
+  {n:'Oluwaseun Adeyemi',id:'JB-005',cls:'Primary 5A',lvl:'Primary',avg:95,tests:12,last:'1 day ago',score:82,status:'active'},
+  {n:'Ngozi Obi',id:'JB-006',cls:'JSS 2B',lvl:'Junior Secondary',avg:79,tests:6,last:'Now',score:79,status:'active'},
+  {n:'Emeka Chukwu',id:'JB-007',cls:'JSS 2C',lvl:'Junior Secondary',avg:72,tests:4,last:'10m ago',score:76,status:'done'},
+  {n:'Aisha Mohammed',id:'JB-008',cls:'SS 2A',lvl:'Senior Secondary',avg:81,tests:7,last:'Now',score:74,status:'active'},
+  {n:'Tunde Bakare',id:'JB-009',cls:'Primary 6A',lvl:'Primary',avg:68,tests:3,last:'3 hrs ago',score:71,status:'done'},
+  {n:'Blessing Nwosu',id:'JB-010',cls:'SS 3A',lvl:'Senior Secondary',avg:90,tests:10,last:'Yesterday',score:68,status:'done'},
+];
+
+const EXAMS_DATA = [
+  {title:'JSS2 Mid-Term Mathematics',lvl:'JSS',subj:'Mathematics',dur:60,qs:40,status:'active',learners:42,start:'09:15 AM'},
+  {title:'SS3 Chemistry Revision',lvl:'SSS',subj:'Chemistry',dur:90,qs:60,status:'active',learners:35,start:'10:00 AM'},
+  {title:'Primary 5 Basic Science',lvl:'Primary',subj:'Basic Science',dur:45,qs:30,status:'ended',learners:30,start:'08:30 AM'},
+  {title:'SS1 Biology Quiz',lvl:'SSS',subj:'Biology',dur:30,qs:20,status:'upcoming',learners:60,start:'12:00 PM'},
+  {title:'JSS1 English Comprehension',lvl:'JSS',subj:'English Language',dur:50,qs:25,status:'upcoming',learners:84,start:'02:00 PM'},
+  {title:'Primary 6 Mathematics',lvl:'Primary',subj:'Mathematics',dur:40,qs:20,status:'draft',learners:0,start:'—'},
+];
+
+const ASSIGN_DATA = [
+  {title:'JSS2 Mid-Term Mathematics',due:'2025-06-05',classes:'JSS 2A, JSS 2B, JSS 2C',submitted:28,total:42,status:'active'},
+  {title:'SS1 Biology Quiz',due:'2025-06-03',classes:'SS 1A, SS 1B',submitted:45,total:60,status:'active'},
+  {title:'Primary 5 Basic Science',due:'2025-05-30',classes:'Primary 5A',submitted:30,total:30,status:'completed'},
+  {title:'JSS1 English Comprehension',due:'2025-06-07',classes:'JSS 1A, 1B, 1C',submitted:12,total:84,status:'active'},
+  {title:'SS3 Chemistry Revision',due:'2025-06-10',classes:'SS 3A',submitted:0,total:35,status:'upcoming'},
+];
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function nav(pageId, navBtn) {
+  document.querySelectorAll('.page').forEach(p => {p.classList.remove('active');p.classList.add('hidden');});
+  const pg = document.getElementById('page-'+pageId);
+  if (pg) {pg.classList.add('active');pg.classList.remove('hidden');}
+  document.querySelectorAll('.tnav').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.sitem').forEach(b => b.classList.remove('active'));
+  if (navBtn) navBtn.classList.add('active');
+  const si = document.getElementById('si-'+pageId);
+  if (si) si.classList.add('active');
+  // Init pages
+  const inits = {
+    leaderboard: () => { renderLeaderboard(); startLBUpdates(); },
+    subjects: () => renderSubjects('primary'),
+    quiz: startQuiz,
+    results: renderResults,
+    assignments: renderAssignmentList,
+    exams: renderExamsList,
+    learners: renderLearners,
+    analytics: renderAnalytics,
+    aibank: renderBankPreview,
+  };
+  if (inits[pageId]) inits[pageId]();
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg, icon='✓') {
+  const t = document.getElementById('toast');
+  document.getElementById('t-msg').textContent = msg;
+  document.getElementById('t-icon').textContent = icon;
+  t.classList.add('show');
+  if (t._timer) clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ============================================================
+// MODALS
+// ============================================================
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ============================================================
+// AI SUBJECT UPDATES
+// ============================================================
+function aiUpdateSubjects() {
+  const lvl = document.getElementById('ai-level').value;
+  const clsSel = document.getElementById('ai-class');
+  const subjSel = document.getElementById('ai-subject');
+  clsSel.innerHTML = '<option value="">Select class...</option>';
+  subjSel.innerHTML = '<option value="">Select subject...</option>';
+  if (!lvl) return;
+  (AI_CLASS_MAP[lvl]||[]).forEach(c => { const o=document.createElement('option');o.textContent=c;clsSel.appendChild(o); });
+  (NERDC_SUBJECTS[lvl]||[]).forEach(s => { const o=document.createElement('option');o.textContent=s.n;subjSel.appendChild(o); });
+}
+
+function examUpdateSubjects() {
+  const lvl = document.getElementById('exam-level').value;
+  const sel = document.getElementById('exam-class');
+  const map = {Primary:['P1','P2','P3','P4','P5','P6'].map((_,i)=>'Primary '+(i+1)),'Junior Secondary':['JSS 1','JSS 2','JSS 3'],'Senior Secondary':['SS 1','SS 2','SS 3']};
+  sel.innerHTML = '';
+  (map[lvl]||[]).forEach(c => { const o=document.createElement('option');o.textContent=c;sel.appendChild(o); });
+}
+
+// ============================================================
+// AI GENERATE
+// ============================================================
+function runAIGenerate() {
+  const lvl = document.getElementById('ai-level').value;
+  const subj = document.getElementById('ai-subject').value;
+  const cnt = parseInt(document.getElementById('ai-count').value)||10;
+  if (!lvl || !subj) { showToast('Please select level and subject first','⚠️'); return; }
+  const thinking = document.getElementById('ai-thinking');
+  thinking.innerHTML = `<div class="thinking-bar"><div class="thinking-dots"><div class="td"></div><div class="td"></div><div class="td"></div></div><span class="thinking-txt">AI searching NERDC ${subj} (${lvl.toUpperCase()}) curriculum — generating ${cnt} questions...</span></div>`;
+  document.getElementById('ai-results-area').classList.add('hidden');
+  setTimeout(() => {
+    thinking.innerHTML = '';
+    document.getElementById('ai-result-label').textContent = `(${cnt} questions · ${subj} · ${lvl.toUpperCase()})`;
+    const container = document.getElementById('ai-q-list');
+    container.innerHTML = '';
+    const letters = ['A','B','C','D'];
+    const showCount = Math.min(cnt, SAMPLE_QS.length);
+    for (let i = 0; i < showCount; i++) {
+      const q = SAMPLE_QS[i % SAMPLE_QS.length];
+      const div = document.createElement('div');
+      div.className = 'q-item';
+      div.innerHTML = `<div class="q-item-meta"><span class="chip green">${q.s}</span><span class="chip gold">${q.l}</span><span class="chip blue">${q.d}</span><span class="chip navy">${q.c}</span><span class="text-xs text-muted mono">Q${i+1}</span></div><div class="q-item-text">${q.t}</div><div class="q-item-opts">${q.o.map((o,idx)=>`<div class="q-opt${idx===q.a?' correct':''}">${letters[idx]}. ${o}</div>`).join('')}</div><div class="q-item-actions"><button class="q-act" onclick="showToast('Question added to bank','🗃️')">+ Add to Bank</button><button class="q-act" onclick="showToast('Question added to exam','📝')">+ Add to Exam</button><button class="q-act" onclick="showToast('Regenerating...','🔄')">↺ Regenerate</button><button class="q-act danger" onclick="this.closest('.q-item').remove()">✕ Remove</button></div>`;
+      container.appendChild(div);
+    }
+    if (cnt > SAMPLE_QS.length) {
+      const more = document.createElement('div');
+      more.style.cssText = 'text-align:center;padding:20px;color:var(--muted);font-size:13px;';
+      more.innerHTML = `+${cnt-SAMPLE_QS.length} more questions generated <button class="btn btn-secondary btn-sm" style="margin-left:10px;" onclick="showToast('Loading all questions...','📄')">Load All</button>`;
+      container.appendChild(more);
+    }
+    document.getElementById('ai-results-area').classList.remove('hidden');
+    showToast(`✓ ${cnt} NERDC questions generated!`, '🤖');
+  }, 2000);
+}
+
+function renderBankPreview() {
+  const tbody = document.getElementById('bank-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  SAMPLE_QS.forEach((q,i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="mono text-xs">${(i+1).toString().padStart(3,'0')}</td><td style="max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${q.t}</td><td><span class="chip green">${q.s}</span></td><td><span class="chip navy">${q.c}</span></td><td><span class="chip gold">${q.l}</span></td><td><span class="chip blue">MCQ</span></td><td><span class="chip ${q.d==='Easy'?'green':q.d==='Medium'?'gold':'red'}">${q.d}</span></td><td><div class="flex-row gap6"><button class="btn btn-secondary btn-sm" onclick="showToast('Question preview opened','👁️')">Preview</button><button class="btn btn-secondary btn-sm" onclick="showToast('Question edited','✏️')">Edit</button></div></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ============================================================
+// LEADERBOARD
+// ============================================================
+let lbInterval;
+function renderLeaderboard() {
+  const sorted = [...LEARNERS_DATA].sort((a,b)=>b.score-a.score);
+  const podium = document.getElementById('lb-podium');
+  if (podium) {
+    const [first,second,third] = [sorted[0],sorted[1],sorted[2]];
+    podium.innerHTML = `
+      <div class="pod-card p2"><div class="pod-crown">🥈</div><div class="pod-av">${second.n[0]}</div><div class="pod-name">${second.n}</div><div class="pod-class">${second.cls}</div><div class="pod-score">${second.score}%</div><div class="pod-rank-lbl">2nd Place</div></div>
+      <div class="pod-card p1"><div class="pod-crown">🥇</div><div class="pod-av">${first.n[0]}</div><div class="pod-name">${first.n}</div><div class="pod-class">${first.cls}</div><div class="pod-score">${first.score}%</div><div class="pod-rank-lbl">1st Place</div></div>
+      <div class="pod-card p3"><div class="pod-crown">🥉</div><div class="pod-av">${third.n[0]}</div><div class="pod-name">${third.n}</div><div class="pod-class">${third.cls}</div><div class="pod-score">${third.score}%</div><div class="pod-rank-lbl">3rd Place</div></div>`;
+  }
+  const tbody = document.getElementById('lb-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  sorted.forEach((l,i) => {
+    const rankCls = i===0?'r1':i===1?'r2':i===2?'r3':'rn';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><span class="lb-row-rank ${rankCls}">${i+1}</span></td><td><strong>${l.n}</strong></td><td><span class="chip navy">${l.cls}</span></td><td><span class="score-pill">${l.score}%</span></td><td class="mono text-sm">${Math.round(l.score*0.4)}/40</td><td class="mono text-sm">${l.time||'—'}</td><td><div style="width:80px;"><div class="prog-mini"><div class="prog-mini-fill" style="width:${Math.round(l.score*0.4/40*100)}%"></div></div></div></td><td><span class="status-indicator"><span class="s-dot ${l.status}"></span>${l.status==='active'?'In Progress':'Submitted'}</span></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function startLBUpdates() {
+  if (lbInterval) clearInterval(lbInterval);
+  lbInterval = setInterval(() => {
+    LEARNERS_DATA.forEach(l => {
+      if (l.status==='active' && Math.random()>0.55) {
+        l.score = Math.min(100, l.score + (Math.random()>0.4?1:0));
+      }
+    });
+    renderLeaderboard();
+  }, 6000);
+}
+
+function switchLeaderboard(v) {
+  const names = {jss2math:'JSS2 Mid-Term Mathematics Examination',ss3chem:'SS3 Chemistry Revision Quiz',pri5sci:'Primary 5 Basic Science Exam'};
+  const el = document.getElementById('lb-exam-name');
+  if (el) el.textContent = names[v]||'Examination';
+  renderLeaderboard();
+}
+
+// ============================================================
+// SUBJECTS
+// ============================================================
+function renderSubjects(level, btn) {
+  if (btn) { document.querySelectorAll('.lvl-tab').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
+  const grid = document.getElementById('subj-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  NERDC_SUBJECTS[level].forEach(s => {
+    const div = document.createElement('div');
+    div.className = 'subj-card';
+    div.innerHTML = `<div class="subj-icon">${s.i}</div><div class="subj-name">${s.n}</div><div class="subj-count">${s.q.toLocaleString()} questions</div><div class="subj-pbar"><div class="subj-pbar-fill" style="width:${s.p}%"></div></div><div class="subj-actions"><button class="btn btn-primary btn-sm" onclick="event.stopPropagation();launchSubject('${s.n}','${level}')">AI Generate</button><button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();showToast('Opening ${s.n} bank...','📚')">View Bank</button></div>`;
+    grid.appendChild(div);
+  });
+}
+
+function launchSubject(name, level) {
+  document.getElementById('ai-level').value = level;
+  aiUpdateSubjects();
+  setTimeout(() => {
+    const subjSel = document.getElementById('ai-subject');
+    for (let o of subjSel.options) { if (o.text === name) { o.selected = true; break; } }
+  }, 50);
+  nav('aibank');
+  showToast(`AI search opened for ${name}`, '🤖');
+}
+
+// ============================================================
+// QUIZ PLAYER
+// ============================================================
+let quizSecs = 3540, quizCurrQ = 0, quizAnswers = {}, quizTimer;
+const QUIZ_TOTAL = 40;
+
+function startQuiz() {
+  quizSecs = 3540; quizCurrQ = 0; quizAnswers = {};
+  renderQuizQ(0);
+  if (quizTimer) clearInterval(quizTimer);
+  quizTimer = setInterval(() => {
+    quizSecs = Math.max(0, quizSecs - 1);
+    const m = Math.floor(quizSecs / 60), s = quizSecs % 60;
+    const el = document.getElementById('qz-timer');
+    if (el) { el.textContent = `${m}:${s.toString().padStart(2,'0')}`; el.classList.toggle('warning', quizSecs < 300); }
+    if (quizSecs === 0) { clearInterval(quizTimer); submitExam(); }
+  }, 1000);
+}
+
+function renderQuizQ(idx) {
+  quizCurrQ = idx;
+  const q = SAMPLE_QS[idx % SAMPLE_QS.length];
+  const pct = ((idx+1)/QUIZ_TOTAL*100).toFixed(1);
+  const curr = document.getElementById('qz-curr'), bar = document.getElementById('qz-bar'), pctEl = document.getElementById('qz-pct');
+  if (curr) curr.textContent = idx+1;
+  if (bar) bar.style.width = pct+'%';
+  if (pctEl) pctEl.textContent = `${idx+1} / ${QUIZ_TOTAL}`;
+  const letters = ['A','B','C','D'];
+  const container = document.getElementById('qz-active-q');
+  if (!container) return;
+  container.innerHTML = `<div class="aq-meta-row"><span class="aq-num">Question ${idx+1} of ${QUIZ_TOTAL}</span><span class="chip green">${q.s}</span><span class="chip gold">${q.l}</span><span class="chip ${q.d==='Easy'?'green':q.d==='Medium'?'gold':'red'}">${q.d}</span></div><div class="aq-text">${q.t}</div><div class="aq-opts">${q.o.map((o,i)=>`<div class="aq-opt${quizAnswers[idx]===i?' selected':''}" onclick="selectAnswer(${idx},${i},this)"><div class="opt-letter">${letters[i]}</div><div class="opt-text">${o}</div></div>`).join('')}</div><div class="aq-nav-row"><button class="btn btn-secondary" onclick="renderQuizQ(${Math.max(0,idx-1)})" ${idx===0?'disabled':''}>← Previous</button><div class="aq-nav-center"><button class="btn btn-secondary btn-sm" onclick="showToast('Question flagged','🚩')">🚩 Flag</button><button class="btn btn-secondary btn-sm" onclick="showToast('Skipped','⏭️')">Skip ⏭</button></div><button class="btn btn-primary" onclick="renderQuizQ(${idx+1})" ${idx>=QUIZ_TOTAL-1?'disabled':''}>Next →</button></div>`;
+}
+
+function selectAnswer(qIdx, optIdx, el) {
+  quizAnswers[qIdx] = optIdx;
+  document.querySelectorAll('.aq-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  el.querySelector('.opt-letter').style.background = 'var(--green)';
+  el.querySelector('.opt-letter').style.color = '#fff';
+}
+
+function submitExam() {
+  clearInterval(quizTimer);
+  const answered = Object.keys(quizAnswers).length;
+  let correct = 0;
+  Object.entries(quizAnswers).forEach(([qi,ai]) => {
+    const q = SAMPLE_QS[parseInt(qi) % SAMPLE_QS.length];
+    if (ai === q.a) correct++;
+  });
+  const score = Math.round(correct/Math.max(answered,1)*100);
+  showToast(`Exam submitted! Score: ${score}% (${correct}/${answered} correct)`, '🏁');
+  nav('results');
+}
+
+// ============================================================
+// RESULTS
+// ============================================================
+function renderResults() {
+  const topics = [
+    {n:'Number & Numeration',correct:8,total:10},
+    {n:'Algebra & Equations',correct:7,total:10},
+    {n:'Geometry & Mensuration',correct:6,total:8},
+    {n:'Statistics & Probability',correct:5,total:6},
+    {n:'Word Problems',correct:9,total:6},
+  ];
+  const tb = document.getElementById('topic-breakdown');
+  if (tb) {
+    tb.innerHTML = '';
+    topics.forEach(t => {
+      const pct = Math.round(t.correct/t.total*100);
+      const div = document.createElement('div');
+      div.style.marginBottom = '14px';
+      div.innerHTML = `<div class="flex-row gap10 mb8"><span style="font-size:13px;font-weight:600;">${t.n}</span><span class="spacer"></span><span class="mono text-xs text-muted">${t.correct}/${t.total}</span><span class="chip ${pct>=80?'green':pct>=60?'gold':'red'}">${pct}%</span></div><div class="prog-mini"><div class="prog-mini-fill" style="width:${pct}%;background:${pct>=80?'var(--green)':pct>=60?'var(--gold)':'var(--red)'}"></div></div>`;
+      tb.appendChild(div);
+    });
+  }
+  const gd = document.getElementById('grade-distribution');
+  if (gd) {
+    const grades = [{g:'A1 (75–100%)',n:12,pct:28,color:'green'},{g:'B2 (70–74%)',n:8,pct:19,color:'green'},{g:'B3 (65–69%)',n:7,pct:17,color:'gold'},{g:'C4 (60–64%)',n:6,pct:14,color:'gold'},{g:'C5 (55–59%)',n:4,pct:10,color:'gold'},{g:'F9 (0–39%)',n:5,pct:12,color:'red'}];
+    gd.innerHTML = '';
+    grades.forEach(g => {
+      const div = document.createElement('div');
+      div.style.marginBottom = '10px';
+      div.innerHTML = `<div class="flex-row gap10 mb6"><span class="text-sm fw7">${g.g}</span><span class="spacer"></span><span class="chip ${g.color}">${g.n} learners</span></div><div class="prog-mini"><div class="prog-mini-fill" style="width:${g.pct}%;background:var(--${g.color==='green'?'green':g.color==='gold'?'gold':'red'})"></div></div>`;
+      gd.appendChild(div);
+    });
+  }
+  const tbody = document.getElementById('results-tbody');
+  if (tbody) {
+    tbody.innerHTML = '';
+    LEARNERS_DATA.forEach(l => {
+      const grade = l.score>=75?'A1':l.score>=70?'B2':l.score>=65?'B3':l.score>=60?'C4':l.score>=55?'C5':l.score>=50?'C6':'F9';
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td class="fw7">${l.n}</td><td><span class="chip navy">${l.cls}</span></td><td>JSS2 Mathematics</td><td><span class="score-pill">${l.score}%</span></td><td><span class="chip ${l.score>=60?'green':l.score>=50?'gold':'red'}">${grade}</span></td><td class="mono text-sm">#${LEARNERS_DATA.filter(x=>x.score>=l.score).length}</td><td class="text-sm text-muted">${l.last}</td><td><div class="flex-row gap6"><button class="btn btn-secondary btn-sm" onclick="showToast('Opening full report...','📊')">View</button><button class="btn btn-secondary btn-sm" onclick="showToast('Report downloaded','📥')">PDF</button></div></td>`;
+      tbody.appendChild(tr);
+    });
+  }
+}
+
+// ============================================================
+// ASSIGNMENTS LIST
+// ============================================================
+function renderAssignmentList() {
+  const container = document.getElementById('assignment-list-container');
+  if (!container) return;
+  container.innerHTML = '';
+  ASSIGN_DATA.forEach(item => {
+    const pct = Math.round(item.submitted/item.total*100);
+    const div = document.createElement('div');
+    div.className = 'assign-item';
+    div.innerHTML = `<div class="assign-header"><div class="assign-title">${item.title}</div><span class="chip ${item.status==='completed'?'blue':item.status==='upcoming'?'gold':'green'}">${item.status}</span></div><div class="assign-meta"><span>📚 ${item.classes}</span><span>📅 Due: ${item.due}</span><span>👥 ${item.total} learners</span></div><div class="assign-prog"><div class="bar"><div class="bar-fill" style="width:${pct}%"></div></div><span class="pct">${item.submitted}/${item.total} submitted (${pct}%)</span><button class="btn btn-secondary btn-sm" onclick="showToast('Opening submissions...','📋')">View</button><button class="btn btn-secondary btn-sm" onclick="showToast('Sending reminder...','📢')">Remind</button></div>`;
+    container.appendChild(div);
+  });
+}
+
+// ============================================================
+// EXAMS LIST
+// ============================================================
+function renderExamsList() {
+  const container = document.getElementById('exams-list-container');
+  if (!container) return;
+  container.innerHTML = '';
+  EXAMS_DATA.forEach(e => {
+    const statusMap = {active:'active',ended:'ended',upcoming:'upcoming',draft:'ended'};
+    const dotCls = statusMap[e.status]||'ended';
+    const div = document.createElement('div');
+    div.className = 'exam-item';
+    div.innerHTML = `<div class="exam-status-dot esd-${dotCls}"></div><div class="exam-item-info"><div class="exam-item-title">${e.title}</div><div class="exam-item-chips"><span class="chip ${e.lvl==='Primary'?'blue':e.lvl==='JSS'?'gold':'purple'}">${e.lvl}</span><span class="chip navy">${e.subj}</span><span class="chip gold">${e.dur} mins</span><span class="chip navy">${e.qs} questions</span><span class="chip ${e.status==='active'?'green':e.status==='ended'?'gray':e.status==='upcoming'?'gold':'gray'}">${e.status}</span>${e.learners?`<span class="chip navy">👥 ${e.learners}</span>`:''}</div></div><div class="exam-item-actions"><button class="btn btn-secondary btn-sm" onclick="showToast('Opening exam...','📝')">View</button><button class="btn btn-secondary btn-sm" onclick="showToast('Duplicated!','📋')">Duplicate</button>${e.status==='active'?`<button class="btn btn-primary btn-sm" onclick="nav('leaderboard')">Live Board</button>`:''}${e.status==='draft'?`<button class="btn btn-gold btn-sm" onclick="showToast('Exam published!','🚀')">Publish</button>`:''}</div>`;
+    container.appendChild(div);
+  });
+}
+
+// ============================================================
+// LEARNERS TABLE
+// ============================================================
+function renderLearners() {
+  const tbody = document.getElementById('learners-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  LEARNERS_DATA.forEach(l => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="fw7">${l.n}</td><td class="mono text-xs text-muted">${l.id}</td><td><span class="chip navy">${l.cls}</span></td><td class="text-sm text-muted">${l.lvl}</td><td><span class="score-pill">${l.avg}%</span></td><td class="mono text-sm">${l.tests}</td><td class="text-sm text-muted">${l.last}</td><td><div class="flex-row gap6"><button class="btn btn-secondary btn-sm" onclick="showToast('Opening profile...','👤')">Profile</button><button class="btn btn-secondary btn-sm" onclick="showToast('Assigning exam...','📋')">Assign</button></div></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ============================================================
+// ANALYTICS
+// ============================================================
+function renderAnalytics() {
+  const subjEl = document.getElementById('analytics-subjects');
+  if (subjEl) {
+    const subjs = [{n:'Mathematics',avg:81,level:'JSS'},{n:'English Language',avg:76,level:'JSS'},{n:'Biology',avg:72,level:'SSS'},{n:'Chemistry',avg:68,level:'SSS'},{n:'Physics',avg:65,level:'SSS'},{n:'Economics',avg:74,level:'SSS'}];
+    subjEl.innerHTML = '';
+    subjs.forEach(s => {
+      const div = document.createElement('div');
+      div.style.marginBottom = '12px';
+      div.innerHTML = `<div class="flex-row gap10 mb6"><span class="text-sm fw7">${s.n}</span><span class="chip navy">${s.level}</span><span class="spacer"></span><span class="mono fw7 text-green">${s.avg}%</span></div><div class="prog-mini"><div class="prog-mini-fill" style="width:${s.avg}%"></div></div>`;
+      subjEl.appendChild(div);
+    });
+  }
+  const weekEl = document.getElementById('analytics-weekly');
+  if (weekEl) {
+    const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const vals = [8,12,6,14,10,4,2];
+    weekEl.innerHTML = `<div style="display:flex;align-items:flex-end;gap:8px;height:80px;padding-bottom:4px;">${days.map((d,i)=>`<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;"><div style="width:100%;height:${vals[i]/14*70}px;background:${vals[i]>=12?'var(--green)':'var(--border)'};border-radius:4px 4px 0 0;"></div><span style="font-size:10px;color:var(--muted);">${d}</span></div>`).join('')}</div>`;
+  }
+  const weakEl = document.getElementById('analytics-weak');
+  if (weakEl) {
+    const weak = [{n:'Further Mathematics',avg:42,lvl:'SSS'},{n:'Chemistry (Organic)',avg:48,lvl:'SSS'},{n:'Physics (Mechanics)',avg:51,lvl:'SSS'},{n:'English (Writing Skills)',avg:55,lvl:'JSS'}];
+    weakEl.innerHTML = `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">${weak.map(w=>`<div class="res-stat"><div class="rs-val red">${w.avg}%</div><div class="rs-lbl">${w.n}<br><span class="chip red" style="margin-top:4px;display:inline-flex;">${w.lvl}</span></div></div>`).join('')}</div>`;
+  }
+}
+
+// ============================================================
+// MINI LEADERBOARD (Dashboard)
+// ============================================================
+function renderMiniLB() {
+  const el = document.getElementById('mini-lb');
+  if (!el) return;
+  const sorted = [...LEARNERS_DATA].sort((a,b)=>b.score-a.score).slice(0,6);
+  el.innerHTML = '';
+  sorted.forEach((l,i) => {
+    const rankCls = i===0?'r1':i===1?'r2':i===2?'r3':'rn';
+    const div = document.createElement('div');
+    div.className = 'mini-lb-item';
+    div.innerHTML = `<span class="lb-row-rank ${rankCls}">${i+1}</span><div class="mini-lb-bar-wrap"><div class="mini-lb-name">${l.n}</div><div class="mini-lb-bar"><div class="mini-lb-bar-fill" style="width:${l.score}%"></div></div></div><span class="mini-lb-score">${l.score}%</span>`;
+    el.appendChild(div);
+  });
+}
+
+// ============================================================
+// LIVE STATS UPDATER (Dashboard)
+// ============================================================
+function startLiveStats() {
+  setInterval(() => {
+    const el = document.getElementById('online-ind');
+    const lc = document.getElementById('live-count');
+    const n = 10 + Math.floor(Math.random()*8);
+    if (el) el.textContent = `● ${n} online`;
+    if (lc) lc.textContent = `${n} LIVE`;
+    const sb = document.getElementById('sb-live');
+    if (sb) sb.textContent = n;
+    const qa = document.getElementById('qa-live-sub');
+    if (qa) qa.textContent = `${n} active now`;
+  }, 8000);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderMiniLB();
+renderSubjects('primary');
+startLiveStats();
+// Pre-render data for pages
+renderLearners();
+renderExamsList();
+renderAssignmentList();
+renderResults();
+renderBankPreview();
+renderAnalytics();
+</script>
+</body>
+</html>
